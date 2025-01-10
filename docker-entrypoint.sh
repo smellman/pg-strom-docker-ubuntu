@@ -212,7 +212,7 @@ docker_setup_db() {
 		EOSQL
 	)"
 	if [ -z "$tablespaceAlreadyExists" ]; then
-	    rm -fr /opt/data/PG_15_* # nvme
+	    rm -fr /opt/data/PG_16_* # nvme
 	fi
     POSTGRES_DB= docker_process_sql --dbname postgres --set db="$POSTGRES_DB" <<-'EOSQL'
 		    CREATE TABLESPACE nvme LOCATION '/opt/data';

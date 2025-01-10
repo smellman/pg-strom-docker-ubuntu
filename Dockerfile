@@ -88,25 +88,25 @@ RUN set -eux; \
 
 RUN mkdir /docker-entrypoint-initdb.d
 
-ENV PG_MAJOR 15
+ENV PG_MAJOR 16
 ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
+ENV POSTGIS_VERSION 3.5.1
 
 WORKDIR /root
 
 #Install the PostgreSQL
 RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
-RUN apt-get update && apt-get install -y postgresql-common build-essential vim wget git gcc make clang-15 && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y && apt-get install -y postgresql-15 postgresql-server-dev-15 postgresql-client-15
+RUN apt-get update && apt-get install -y postgresql-common build-essential vim wget git gcc make clang-15 && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y && apt-get install -y postgresql-$PG_MAJOR postgresql-server-dev-$PG_MAJOR postgresql-client-$PG_MAJOR
 
 # If you want to use the full version of PG-Strom, Please Remove the Comments.
 COPY heterodb.license /etc/heterodb.license
 RUN wget https://heterodb.github.io/swdc/deb/heterodb-extra_5.4-1_amd64.deb && dpkg -i /root/heterodb-extra_5.4-1_amd64.deb
 
-# If you want to use the GPU-PostGIS, Please Remove the Comments.
-# RUN apt-get update && apt-get install -y postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
+# Install postgis from source
 RUN apt install -y libgdal-dev libprotobuf-c-dev protobuf-c-compiler
-RUN wget https://download.osgeo.org/postgis/source/postgis-3.3.7.tar.gz && \
-    tar zxf postgis-3.3.7.tar.gz && \
-	cd postgis-3.3.7 && \
+RUN wget https://download.osgeo.org/postgis/source/postgis-$POSTGIS_VERSION.tar.gz && \
+    tar zxf postgis-$POSTGIS_VERSION.tar.gz && \
+	cd postgis-$POSTGIS_VERSION && \
 	./configure && \
 	make -j && \
 	make install
@@ -131,7 +131,7 @@ RUN install --verbose --directory --owner postgres --group postgres --mode 1777 
 #VOLUME /var/lib/postgresql/16/main
 VOLUME /var/lib/postgresql/data
 #Workaround
-RUN echo "PATH = '/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'" >> /etc/postgresql/15/main/environment
+RUN echo "PATH = '/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'" >> /etc/postgresql/$PG_MAJOR/main/environment
 
 #Install the PG-Strom
 RUN git clone https://github.com/heterodb/pg-strom && cd /root/pg-strom/src && \
@@ -148,7 +148,7 @@ RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
 #COPY pg_hba.conf /var/lib/postgresql/16/main/pg_hba.conf
 #COPY pg_hba.conf /etc/postgresql/16/main/hba.conf
 
-RUN echo "PATH = '/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'" >> /var/lib/postgresql/15/main/environment
+RUN echo "PATH = '/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'" >> /var/lib/postgresql/$PG_MAJOR/main/environment
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 
