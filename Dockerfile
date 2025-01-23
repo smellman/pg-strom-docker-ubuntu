@@ -90,7 +90,7 @@ RUN mkdir /docker-entrypoint-initdb.d
 
 ENV PG_MAJOR 16
 ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
-ENV POSTGIS_VERSION 3.5.1
+ENV POSTGIS_VERSION 3.5.2
 
 WORKDIR /root
 
@@ -99,8 +99,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 RUN apt-get update && apt-get install -y postgresql-common build-essential vim wget git gcc make clang-15 && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y && apt-get install -y postgresql-$PG_MAJOR postgresql-server-dev-$PG_MAJOR postgresql-client-$PG_MAJOR
 
 # If you want to use the full version of PG-Strom, Please Remove the Comments.
-COPY heterodb.license /etc/heterodb.license
-RUN wget https://heterodb.github.io/swdc/deb/heterodb-extra_5.4-1_amd64.deb && dpkg -i /root/heterodb-extra_5.4-1_amd64.deb
+# COPY heterodb.license /etc/heterodb.license
+# RUN wget https://heterodb.github.io/swdc/deb/heterodb-extra_5.4-1_amd64.deb && dpkg -i /root/heterodb-extra_5.4-1_amd64.deb
 
 # Install postgis from source
 RUN apt install -y libgdal-dev libprotobuf-c-dev protobuf-c-compiler
